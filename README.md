@@ -1,29 +1,22 @@
 # vue2-drawboard
 
 ## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
+```sh
+npm install vue2-drawboard -S
 ```
 
-### Compiles and minifies for production
+## plugin Use
+```js
+import Drawboard from 'vue2-drawboard'
+ 
+components: {
+  Drawboard
+}
 ```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
+```html
+<draw-board :url="url"></draw-board>
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Keywords
+Drawboard Vue
+

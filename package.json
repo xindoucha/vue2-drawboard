@@ -1,18 +1,20 @@
 {
   "name": "vue2-drawboard",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build"
   },
+  "main": "dist/drawBoard.js",
   "dependencies": {
     "core-js": "^3.6.5",
+    "element-ui": "^2.14.0",
     "vue": "^2.6.11"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.5.0",
     "@vue/cli-service": "^4.5.0",
+    "babel-plugin-component": "^1.1.1",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
     "vue-template-compiler": "^2.6.11"
