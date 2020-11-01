@@ -1,11 +1,20 @@
 {
   "name": "vue2-drawboard",
   "version": "0.1.0",
+  "license": "MIT",
+  "description": "a drawboard based on vue2.x",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "lib": "vue-cli-service build --target lib --name drawboard --dest lib packages/index.js"
   },
-  "main": "dist/drawBoard.js",
+  "author": "xindoucha",
+  "keyword": "drawboard",
+  "main": "lib/drawboard.umd.min.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xindoucha/vue2-drawboard.git"
+  },
   "dependencies": {
     "core-js": "^3.6.5",
     "element-ui": "^2.14.0",
