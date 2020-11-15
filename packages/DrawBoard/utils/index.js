@@ -162,3 +162,19 @@ export function exitScreen() {
     document.mozCancelFullScreen();
   }
 }
+
+/**
+ * debounce
+ * @param {function} fn 
+ * @param {number} time 
+ */
+export function debounce(fn,time){
+  let timer = null;
+  return function(){
+    var args = arguments, context = this;
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      fn.call(context, ...args)
+    }, time)
+  }
+}

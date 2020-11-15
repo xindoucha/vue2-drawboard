@@ -46,7 +46,8 @@ import {
   canvasToImage,
   imageToCanvas,
   fullScreen,
-  exitScreen
+  exitScreen,
+  debounce
 } from "./utils/index";
 import { status, generateGrid, drawNavigationLine } from "./draw/index";
 import figureFactory from "./draw/figureFactory.js";
@@ -124,30 +125,8 @@ export default {
   },
   watch:{
     graphics:{
-      handler() {
-        this.resultData = [];
-        this.graphics.forEach(figure => {
-          let tmpFigure = {}
-          tmpFigure.type = figure.type
-          tmpFigure.points = []
-          for (let i = 0; i < figure.points.length; i++) {
-            tmpFigure.points[i] = canvasToImage(
-              figure.points[i].x,
-              figure.points[i].y,
-              this.imagePosX,
-              this.imagePosY,
-              this.viewWidth,
-              this.viewHeight,
-              this.imageXOffset,
-              this.imageYOffset,
-              this.imageScale,
-              this.scale,
-              this.degree
-            );
-          }
-          this.resultData.push(tmpFigure);
-        })
-        this.$emit("updateData",this.resultData)
+      handler(){
+        debounce(this.sendResultData,100)()
       },
       deep:true,
       immediate: true
@@ -163,7 +142,7 @@ export default {
     },
     labelDataOrigin:{
       handler(){
-        this.loadImage(this.url)
+        this.initRenderData(newData)
       },
       immediate: true,
       deep:true
@@ -204,6 +183,31 @@ export default {
     observerView(){
       this.observer = new ResizeObserver(this.initSize)
       this.observer.observe(this.view)
+    },
+    sendResultData() {
+      this.resultData = [];
+        this.graphics.forEach(figure => {
+          let tmpFigure = {}
+          tmpFigure.type = figure.type
+          tmpFigure.points = []
+          for (let i = 0; i < figure.points.length; i++) {
+            tmpFigure.points[i] = canvasToImage(
+              figure.points[i].x,
+              figure.points[i].y,
+              this.imagePosX,
+              this.imagePosY,
+              this.viewWidth,
+              this.viewHeight,
+              this.imageXOffset,
+              this.imageYOffset,
+              this.imageScale,
+              this.scale,
+              this.degree
+            );
+          }
+          this.resultData.push(tmpFigure);
+        })
+        this.$emit('updateData',this.resultData)
     },
     getImageInfo(x, y, width, height, scale) {
       this.imagePosX = Math.round(x);

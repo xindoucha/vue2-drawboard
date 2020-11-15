@@ -1,6 +1,6 @@
 # vue2-drawboard
 ## Introduction
-This is a drawboard tool based on vue2.x. Through this tool you can use to mark the information you want on a picture and get the corresponding data. In addition, you can also use it as an ordinary drawboard, where you can freely draw graphics on it. The currently supported types are polyline, rectangle, polygon, etc. Can support zoom in, zoom out, rotation, translation and other operations.Besides, you can flexibly configure your drawing information.
+This is a drawboard tool based on vue2.x and canvas. Through this tool you can mark the information you want on a picture and get the corresponding data. In addition, you can also use it as an ordinary drawboard, where you can freely draw graphics on it. The currently supported types are polyline, rectangle, polygon, etc. Can support zoom in, zoom out, rotation, translation and other operations.Besides, you can flexibly configure your drawing information.
 
 ## Installation
 ```sh
@@ -85,5 +85,5 @@ export default {
 + Required: True
 > Through this method you can get the labeled data.
 ## Keywords
-Drawboard Vue
+Drawboard canvas Vue2.x Data-labeling
 

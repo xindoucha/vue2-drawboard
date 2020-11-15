@@ -1,6 +1,6 @@
 <template>
   <div>
-    <drawboard :url="url"></drawboard>
+    <drawboard :url="url" @updateData="updateData"></drawboard>
   </div>
 </template>
 
@@ -12,6 +12,11 @@ export default {
       url:"https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg",
       labelDataOrigin:[],
       loadingData:false
+    }
+  },
+  methods:{
+    updateData(data) {
+      console.log(data);
     }
   }
 }
