@@ -2,7 +2,6 @@
 import {canvasToImage,imageToCanvas} from '../utils/index.js'
 import figureFactory from "./figureFactory.js";
 
-// 把点从canvas上映射到图片上
 // Convert the point coordinates from the canvas to the the image.
 function formatPointsInImage(graphics,options) {
   graphics.forEach(figure => {
@@ -44,7 +43,8 @@ function formatPointsInCanvas(graphics,options) {
     }
   });
 }
-// 把点从canvas上映射到图片上--移动时
+
+// Convert the point coordinates from the canvas to the the image when moving.
 function formatPointsInImageWhenMove(graphics,options) {
   let tmpGraphics = [];
   graphics.forEach(figure => {
@@ -69,6 +69,7 @@ function formatPointsInImageWhenMove(graphics,options) {
   return tmpGraphics;
 }
 
+// Convert the point coordinates from the image to the the canvas when moving.
 function formatPointsInCanvasWhenMove(graphics,options) {
   graphics.forEach(figure => {
     for (let i = 0; i < figure.points.length; i++) {
@@ -131,50 +132,5 @@ imageEvent.drawTmpGraphics = function(graphics,ctx) {
     graphic.draw(ctx);
   });
 }
-/*
-
-getImageInfo(x, y, width, height, scale) {
-  this.posX = Math.round(x);
-  this.posY = Math.round(y);
-  this.imageWidth = width;
-  this.imageHeight = height;
-  this.imageScale = scale;
-},
-showPosition(e) {
-  this.currentPoint = windowToCanvas(this.canvas, e.clientX, e.clientY);
-  let { x, y } = windowToCanvas(this.canvas, e.clientX, e.clientY);
-  let resObj = canvasToImage(
-    x,
-    y,
-    this.posX,
-    this.posY,
-    this.canvasWidth,
-    this.canvasHeight,
-    this.imageXOffset,
-    this.imageYOffset,
-    this.imageScale,
-    this.scale,
-    this.degree
-  );
-  this.cursorPosX = resObj.x;
-  this.cursorPosY = resObj.y;
-  this.afterPoint = imageToCanvas(
-    this.cursorPosX,
-    this.cursorPosY,
-    this.posX,
-    this.posY,
-    this.canvasWidth,
-    this.canvasHeight,
-    this.imageXOffset,
-    this.imageYOffset,
-    this.imageScale,
-    this.scale,
-    this.degree
-  );
-},
-updateImage() {
-  this.image.style.transform = `scale(${this.scale},${this.scale}) translate(${this.imageXOffset}px,${this.imageYOffset}px) rotateZ(${this.degree}deg)`;
-}
-*/
 
 export default imageEvent;

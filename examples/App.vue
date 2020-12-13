@@ -16,7 +16,7 @@ export default {
   },
   methods:{
     updateData(data) {
-      console.log(data);
+      // console.log(data);
     }
   }
 }

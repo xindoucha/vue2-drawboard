@@ -141,8 +141,10 @@ export default {
       immediate: true
     },
     labelDataOrigin:{
-      handler(){
-        this.initRenderData(newData)
+      handler(newData){
+        if (newData.length>0) {
+          this.initRenderData(newData)
+        }
       },
       immediate: true,
       deep:true
@@ -448,7 +450,7 @@ export default {
             this.focusCicle(this.canvasCtx,this.activeGraphic.points[0],this.options.point_lineWidth,this.options.point_strokeStyle,this.options.point_radis*2)
           }
           this.previewGraphic(this.canvasCtx,this.activeGraphic,this.mouseEndPoint)
-        }else {
+        }else if(["rectangle"].includes(this.currentTool)) {
           this.activeGraphic.initFigure(this.mouseStartPoint,this.mouseEndPoint)
         }
       }

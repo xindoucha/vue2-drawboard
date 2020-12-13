@@ -214,6 +214,26 @@ class Rectangle extends Graph {
 }
 
 /**
+ * Point
+ */
+class Point extends Graph {
+  constructor(point,options) {
+    super(point,options);
+    this.points = [point];
+    this.type = "point";
+  }
+  createPath(ctx) {
+    ctx.beginPath();
+    ctx.lineWidth = this.path_lineWidth;
+    ctx.fillStyle = this.path_strokeStyle;
+    ctx.strokeStyle = this.path_strokeStyle;
+    ctx.arc(this.points[0].x,this.points[0].y,3,0,Math.PI*2,true);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+/**
  * factory function for creating graph 
  **/
 export default function figureFactory(type, point, options) {
@@ -224,6 +244,8 @@ export default function figureFactory(type, point, options) {
       return new Polygon(point,options);
     case "polyline":
       return new Polyline(point,options);
+    case "point":
+      return new Point(point,options);
     default:
       return new Rectangle(point,options);
   }

@@ -9,6 +9,9 @@
     <el-tooltip effect="dark" content="多边形" placement="right">
       <i class="el-icon-house" @click="changeTool('polygon')"></i>
     </el-tooltip>
+    <el-tooltip effect="dark" content="点" placement="right">
+      <i class="el-icon-aim" @click="changeTool('point')"></i>
+    </el-tooltip>
   </div>
 </template>
 

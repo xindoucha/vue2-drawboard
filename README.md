@@ -84,6 +84,7 @@ export default {
 + Type: Function
 + Required: True
 > Through this method you can get the labeled data.
+
 ## Keywords
 Drawboard canvas Vue2.x Data-labeling
 

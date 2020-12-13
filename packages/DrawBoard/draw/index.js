@@ -56,13 +56,24 @@ export function drawNavigationLine(canvas, x, y) {
   }
   ctx.save();
   ctx.strokeStyle = "#2af598";
-  ctx.lineWidth = 0.5;
+  ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(x + 0.5, 0);
+  ctx.lineTo(x + 0.5, y - 20);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x + 0.5, y + 20);
   ctx.lineTo(x + 0.5, canvas.height);
   ctx.stroke();
   ctx.beginPath();
+  ctx.arc(x, y, 1, 0, Math.PI * 2, false)
+  ctx.stroke();
+  ctx.beginPath();
   ctx.moveTo(0, y + 0.5);
+  ctx.lineTo(x - 20, y + 0.5);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x + 20, y + 0.5);
   ctx.lineTo(canvas.width, y + 0.5);
   ctx.stroke();
   ctx.restore();
