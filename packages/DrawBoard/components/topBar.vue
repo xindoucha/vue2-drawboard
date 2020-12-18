@@ -33,6 +33,14 @@
     <el-tooltip effect="dark" content="设置" placement="bottom">
       <i class="el-icon-setting" @click="configDialogVisiable = true"></i>
     </el-tooltip>
+    <div class="text-container">
+      <div class="text">对比度: </div>
+      <el-slider v-model="contrast" :format-tooltip="formatTooltip" :debounce="20"></el-slider>
+    </div>
+    <div class="text-container">
+      <div class="text">亮度: </div>
+      <el-slider v-model="brightness" :format-tooltip="formatTooltip" :debounce="20"></el-slider>
+    </div>
     <div class="status">
       当前状态：{{this.currentStatus}}
     </div>
@@ -88,6 +96,8 @@ export default {
   data() {
     return {
       configDialogVisiable: false,
+      contrast:50, // 对比度
+      brightness:50, // 亮度
       // 绘图参数
       config: {
         path_lineWidth: 1,
@@ -107,11 +117,26 @@ export default {
       },
       immediate:true,
       deep:true
+    },
+    contrast: {
+      handler() {
+        this.$emit('contrastChange',Math.floor(this.contrast-50))
+      },
+      immediate:true
+    },
+    brightness: {
+      handler() {
+        this.$emit('brightnessChange',Math.floor(this.brightness-50))
+      },
+      immediate:true
     }
   },
   methods: {
     changeEvent(eventName) {
       this.$emit("topBarEvent", eventName);
+    },
+    formatTooltip(val) {
+      return parseInt(val - 50);
     }
   },
 };
@@ -151,5 +176,39 @@ export default {
   margin-top: 8px;
   width: 160px;
   font-size: 14px;
+}
+</style>
+
+<style scoped>
+.text-container{
+  display:inline-block;
+  vertical-align: middle;
+  height: 30px;
+  line-height: 30px;
+  font-size: 14px;
+  margin-bottom: 10px;
+  vertical-align: middle;
+  padding: 0 4px;
+}
+.text{
+  display:inline-block;
+  margin-right: 8px;
+}
+>>>.el-slider{
+  height: 22px;
+  display:inline-block;
+  width: 60px;
+}
+>>>.el-slider__runway{
+  margin:15px 0;
+  background-color: #000;
+}
+>>>.el-slider__bar{
+  background-color: #E4E7ED;
+}
+>>>.el-slider__button{
+  width:12px;
+  height: 12px;
+  border: 1px solid #000;
 }
 </style>

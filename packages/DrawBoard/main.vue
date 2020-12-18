@@ -7,6 +7,8 @@
             :currentStatus="currentStatus"
             @topBarEvent="topBarEvent"
             @configChange="configChange"
+            @contrastChange="contrastChange"
+            @brightnessChange="brightnessChange"
           ></topBar>
         </div>
         <div class="wrapper">
@@ -105,7 +107,8 @@ export default {
       currentStatus: status.DEFAULT, // DRAWING/MOVING/UPDATING
       observer:null,
       isFullScreen:false,
-      loading:false
+      loading:false,
+      imagePixelData:[] 
     };
   },
   computed: {
@@ -217,7 +220,8 @@ export default {
       this.imageWidth = width;
       this.imageHeight = height;
       this.imageScale = scale;
-      this.loading = false
+      this.loading = false;
+      this.imagePixelData = this.imageCtx.getImageData(this.imagePosX,this.imagePosY,this.imageWidth*this.imageScale,this.imageHeight*this.imageScale);
       if (this.labelDataOrigin) {
         this.initRenderData(this.labelDataOrigin)
       }
@@ -353,6 +357,11 @@ export default {
         e.clientX,
         e.clientY
       );
+      if(this.isPointOutside(this.mouseStartPoint)) {
+        this.$message.closeAll();
+        this.$message.info("点在图片外面啦！")
+        return;
+      }
       this.lastMouseEndPoint = this.mouseStartPoint;
       this.canvas.addEventListener("mousemove", this.canvasMousemove, false);
       this.canvas.addEventListener("mouseup", this.canvasMouseup, false);
@@ -417,6 +426,11 @@ export default {
     },
     canvasMousemove(e) {
       this.mouseEndPoint = windowToCanvas(this.canvas, e.clientX, e.clientY);
+      if(this.isPointOutside(this.mouseEndPoint)) {
+        this.$message.closeAll();
+        this.$message.info("点在图片外面啦！")
+        return;
+      }
       if (this.currentStatus === status.MOVING) {
         let translateX =
           this.imageXOffset + (this.mouseEndPoint.x - this.mouseStartPoint.x);
@@ -434,6 +448,10 @@ export default {
         this.drawBG();
         this.drawGraphics();
         if (this.pointIndex > -1) {
+          // 如果超过图片边界 则停止
+          if(this.hasPointOutside(this.activeGraphic)) {
+            return;
+          }
           if (this.pointIndex === 999) {
             this.activeGraphic.move(this.lastMouseEndPoint, this.mouseEndPoint);
             this.lastMouseEndPoint = this.mouseEndPoint
@@ -558,6 +576,112 @@ export default {
     },
     updateImage() {
       this.image.style.transform = `scale(${this.scale},${this.scale}) translate(${this.imageXOffset}px,${this.imageYOffset}px) rotateZ(${this.degree}deg)`;
+    },
+    isPointOutside(point) {
+      let pointOutside = canvasToImage(
+        point.x,
+        point.y,
+        this.imagePosX,
+        this.imagePosY,
+        this.viewWidth,
+        this.viewHeight,
+        this.imageXOffset,
+        this.imageYOffset,
+        this.imageScale,
+        this.scale,
+        this.degree
+      );
+      if(pointOutside.x < 0 || pointOutside.x > this.imageWidth || pointOutside.y < 0 || pointOutside.y > this.imageHeight) {
+        return true;
+      }else{
+        return false;
+      }
+    },
+    hasPointOutside(shape) {
+      let result = false
+      shape.points.forEach((p) => {
+        if(this.isPointOutside(p)) {
+          result = true
+        }
+      })
+      return result;
+    },
+    contrastChange(radio) {
+      this.changePixelForContrast(radio)
+    },
+    brightnessChange(radio) {
+      this.changePixelForBright(radio)
+    },
+    changePixelForContrast(radio) {
+      if (!this.imageCtx) return;
+      let imageData = this.imageCtx.getImageData(this.imagePosX,this.imagePosY,this.imageWidth*this.imageScale,this.imageHeight*this.imageScale);
+      
+      let data = imageData.data;
+      let data0 = this.imagePixelData.data
+      // RGB = RGB + (RGB - avg) * Contrast / 255
+      let avg_r = 0
+      let avg_g = 0
+      let avg_b = 0
+      for ( var i = 0; i < data0.length; i += 4 ) {
+        avg_r += data0[i]
+        avg_g += data0[i+1]
+        avg_b += data0[i+2]
+      }
+      avg_r /= (data0.length/4)
+      avg_g /= (data0.length/4)
+      avg_b /= (data0.length/4)
+      for ( var i = 0; i < data.length; i += 4 ) {
+        data[i] = data0[i] + (data0[i] - avg_r) * radio / 50
+        if (data[i] > 255) {
+          data[i] = 255;
+        } else if(data[i] < 0) {
+          data[i] = 0;
+        }
+        data[i+1] = data0[i+1] + (data0[i+1] - avg_g) * radio / 50
+        if (data[i+1] > 255) {
+          data[i+1] = 255;
+        } else if (data[i+1] < 0) {
+          data[i+1] = 0;
+        }
+        data[i+2] = data0[i+2] + (data0[i+2] - avg_b) * radio / 50
+        if (data[i+2] > 255) {
+          data[i+2] = 255;
+        } else if (data[i+2] < 0) {
+          data[i+2] = 0;
+        }
+      }
+      this.imageCtx.putImageData(imageData,this.imagePosX,this.imagePosY);
+    },
+    changePixelForBright(radio) {
+      if (!this.imageCtx) return;
+      let imageData = this.imageCtx.getImageData(this.imagePosX,this.imagePosY,this.imageWidth*this.imageScale,this.imageHeight*this.imageScale);
+      let data = imageData.data;
+      let data0 = this.imagePixelData.data
+      let newRadio = parseInt(radio/50*255)
+      for(var i = 0; i < data.length; i += 4 ) {
+        if(data0[i]+newRadio>255){
+          data[i]=255;
+        }else if(data0[i]+newRadio<0){
+          data[i]=0;
+        }else {
+          data[i] = data0[i]+ newRadio;
+        }
+        if((data0[i+1]+newRadio)>255){
+          data[i+1]=255;
+        }else if((data0[i+1]+newRadio)<0){
+          data[i+1]=0;
+        }else {
+          data[i+1] = data0[i+1]+ newRadio;
+        }
+        if((data0[i+2]+newRadio)>255){
+          data[i+2]=255;
+        }else if((data0[i+2]+newRadio)<0){
+          data[i+2]=0;
+        }else{
+          data[i+2] = data0[i+2] + newRadio;
+        }
+      }
+      this.imageCtx.putImageData(imageData,this.imagePosX,this.imagePosY);
     }
   }
 };
