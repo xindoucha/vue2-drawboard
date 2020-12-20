@@ -9,7 +9,7 @@
     "lib": "vue-cli-service build --target lib --name drawboard --dest lib packages/index.js"
   },
   "author": "xindoucha",
-  "keyword": "drawboard canvas vue label",
+  "keyword": "drawboard canvas vue data-label",
   "main": "lib/drawboard.umd.min.js",
   "repository": {
     "type": "git",

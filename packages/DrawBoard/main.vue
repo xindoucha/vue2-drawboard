@@ -238,8 +238,8 @@ export default {
       this.graphics = []
       let initGraphics = JSON.parse(JSON.stringify(data))
       initGraphics.forEach((figure,index)=>{
-        let type = figure.name || figure.type;
-        let tmpfigure = figureFactory(type, figure.points[0]);
+        let type = figure.type;
+        let tmpfigure = figureFactory(type, figure.points[0],figure.options || {});
         tmpfigure.points = []
         figure.points.forEach((point,index)=>{
           tmpfigure.points[index] = imageToCanvas(

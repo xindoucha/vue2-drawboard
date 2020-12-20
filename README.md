@@ -1,6 +1,6 @@
 # vue2-drawboard
 ## Introduction
-This is a drawboard tool based on vue2.x and canvas. Through this tool you can mark the information you want on a picture and get the corresponding data. In addition, you can also use it as an ordinary drawboard, where you can freely draw graphics on it. The currently supported types are polyline, rectangle, polygon, etc. Can support zoom in, zoom out, rotation, translation and other operations.Besides, you can flexibly configure your drawing information.
+This is a drawboard tool based on vue2.x and canvas. Through this tool you can mark the information you want on a picture and get the corresponding data. In addition, you can also use it as an ordinary drawboard, where you can freely draw graphics on it. The currently supported types are polyline, rectangle, polygon, point, etc. Can support zoom in, zoom out, rotation, translation and other operations.Besides, you can flexibly configure your drawing information.
 
 ## Installation
 ```sh
@@ -54,23 +54,35 @@ export default {
 [
   {
     "type":"rectangle",
-    "points":
-    [
+    "points":[
       {"x":228,"y":240},
       {"x":287,"y":240},
       {"x":287,"y":286},
       {"x":228,"y":286}
-    ]
+    ],
+    "options":{
+      "path_lineWidth":"4",
+      "path_strokeStyle":"#f00",
+      "point_radis":"5", // Judge whether to select the point when clicking
+      "point_lineWidth":"2",
+      "point_strokeStyle":"#999" // The color of the point when selected
+    }
   },
   {
     "type":"rectangle",
-    "points":
-      [
-        {"x":402,"y":214},
-        {"x":438,"y":214},
-        {"x":438,"y":249},
-        {"x":402,"y":249}
-      ]
+    "points":[
+      {"x":402,"y":214},
+      {"x":438,"y":214},
+      {"x":438,"y":249},
+      {"x":402,"y":249}
+    ],
+    "options":{
+      "path_lineWidth":"4",
+      "path_strokeStyle":"#f00",
+      "point_radis":"5", // Judge whether to select the point when clicking
+      "point_lineWidth":"2",
+      "point_strokeStyle":"#999" // The color of the point when selected
+    }
   }
 ]
 ```
