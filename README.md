@@ -97,6 +97,11 @@ export default {
 + Required: True
 > Through this method you can get the labeled data.
 
+### drawEventDone
++ Type: Function
++ Required: False
+> Through this method you can do what you want when finish drawing.
+
 ## Keywords
 Drawboard canvas Vue2.x Data-labeling
 

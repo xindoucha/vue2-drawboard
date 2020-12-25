@@ -163,6 +163,7 @@ export default {
     this.initSize();
     this.observerView()
     this.canvas.addEventListener("mousemove", this.drawNavigationLineEvent, false);
+    this.listenScroll();
   },
   beforeDestroy() {
     this.canvas.removeEventListener("mousemove", this.canvasMousemove, false);
@@ -171,6 +172,25 @@ export default {
     this.observer.disconnect()
   },
   methods: {
+    listenScroll() {
+      let w = this
+      document.onkeydown = function(e) {
+        if (e.keyCode === 17) w.ctrlDown = true
+      },
+      document.onkeyup = function(e) {
+        if (e.keyCode === 17) w.ctrlDown = false
+      },
+      document.getElementsByClassName('container')[0].addEventListener('mousewheel',(e) => {
+        e.preventDefault();
+        if(w.ctrlDown) {
+          if(e.wheelDeltaY > 0) {  // 放大
+            this.topBarEvent("zoomIn")
+          } else {  // 缩小
+            this.topBarEvent("zoomOut")
+          }
+        }
+      },false); 
+    },
     initSize() {
       this.canvas = this.$refs.canvas;
       this.image = this.$refs.image;
@@ -184,6 +204,16 @@ export default {
       this.image.setAttribute("width", this.viewWidth);
       this.canvas.setAttribute("height", this.viewHeight);
       this.canvas.setAttribute("width", this.viewWidth);
+      if (this.url) {
+        this.loadImage(this.url)
+      }
+      if (this.graphics.length>0) {
+        if (this.canvasCtx) {
+          this.drawBG();
+          this.drawGraphics();
+          this.readyForNewEvent("draw");
+        }
+      }
     },
     observerView(){
       this.observer = new ResizeObserver(this.initSize)
@@ -222,7 +252,7 @@ export default {
       this.imageScale = scale;
       this.loading = false;
       this.imagePixelData = this.imageCtx.getImageData(this.imagePosX,this.imagePosY,this.imageWidth*this.imageScale,this.imageHeight*this.imageScale);
-      if (this.labelDataOrigin) {
+      if (this.labelDataOrigin.length>0) {
         this.initRenderData(this.labelDataOrigin)
       }
       this.readyForNewEvent("draw")
@@ -402,6 +432,7 @@ export default {
               this.readyForNewEvent("draw")
               this.drawBG();
               this.drawGraphics();
+              this.drawEventDone();
             } else {
               this.activeGraphic.points.push(this.mouseStartPoint);
             }
@@ -495,7 +526,8 @@ export default {
           this.drawGraphics();
         }
         if (!(["polygon", "polyline"].includes(this.currentTool))) {
-          this.readyForNewEvent()
+          this.readyForNewEvent();
+          this.drawEventDone();
         }
       }
     },
@@ -605,6 +637,9 @@ export default {
         }
       })
       return result;
+    },
+    drawEventDone() {
+      this.$emit('drawEventDone')
     },
     contrastChange(radio) {
       this.changePixelForContrast(radio)
