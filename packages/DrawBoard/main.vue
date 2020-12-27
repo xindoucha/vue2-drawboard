@@ -67,6 +67,10 @@ export default {
       type:String,
       required: true
     },
+    userOptions:{
+      type:Object,
+      default:() => {}
+    },
     labelDataOrigin:{
       type: Array,
       default:() => []
@@ -142,6 +146,12 @@ export default {
         }
       },
       immediate: true
+    },
+    userOptions:{
+      handler() {
+        this.options = Object.assign(this.options,JSON.parse(JSON.stringify(this.userOptions)))
+      },
+      deep:true
     },
     labelDataOrigin:{
       handler(newData){

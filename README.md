@@ -19,7 +19,7 @@ Vue.use(DrawBoard);
 ```vue
 <template>
   <div id="app">
-    <drawboard :url="url" @updateData="updateData"></drawboard>
+    <drawboard :url="url" @updateData="updateData" @drawEventDone="drawEventDone"></drawboard>
   </div>
 </template>
 
@@ -35,6 +35,9 @@ export default {
   methods:{
     updateData(data){
       console.log(data);
+    },
+    drawEventDone() {
+      console.log("well done!");
     }
   }
 }
@@ -86,6 +89,12 @@ export default {
   }
 ]
 ```
+### userOptions
++ Type: Object
++ Required: False
++ default: {}
+> You can configure the drawing parameters by this variable.The parameter form is the same as the options in labelDataOrigin above.
+
 ### loadingData 
 + Type: Boolean
 + Required: False
