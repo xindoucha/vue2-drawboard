@@ -111,6 +111,16 @@ export default {
 + Required: False
 > Through this method you can do what you want when finish drawing.
 
+### deleteFigureCb
++ Type: Function
++ Required: False
+> This is a callback function after deleting an item, and parameter is the index value of the deleted item
+
+### clearAllCb
++ Type: Function
++ Required: False
+> This is a callback function after clear the drawboard.
+
 ## Keywords
 Drawboard canvas Vue2.x Data-labeling
 

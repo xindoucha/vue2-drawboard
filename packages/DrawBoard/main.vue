@@ -360,6 +360,7 @@ export default {
     },
     clearAll() {
       this.graphics = [];
+      this.$emit("clearAllCb")
       this.drawBG();
       this.readyForNewEvent("draw");
     },
@@ -594,6 +595,7 @@ export default {
       } else if (e.keyCode == 46) {
         if (this.activeIndex > -1) {
           this.graphics.splice(this.activeIndex, 1);
+          this.$emit("deleteFigureCb",this.activeIndex);
           this.readyForNewEvent("draw")
           this.drawBG();
           this.drawGraphics();
