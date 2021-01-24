@@ -47,6 +47,7 @@ import {
   windowToCanvas,
   canvasToImage,
   imageToCanvas,
+  formatPointRange,
   fullScreen,
   exitScreen,
   debounce
@@ -147,6 +148,14 @@ export default {
       },
       immediate: true
     },
+    activeIndex: {
+      handler(val) {
+        if (this.currentStatus === 'UPDATING') {
+          this.$emit('activeIndexChange', val)
+        }
+      },
+      immediate: true
+    },
     userOptions:{
       handler() {
         this.options = Object.assign(this.options,JSON.parse(JSON.stringify(this.userOptions)))
@@ -174,6 +183,7 @@ export default {
     this.observerView()
     this.canvas.addEventListener("mousemove", this.drawNavigationLineEvent, false);
     this.listenScroll();
+    this.addRightMouseEvent()
   },
   beforeDestroy() {
     this.canvas.removeEventListener("mousemove", this.canvasMousemove, false);
@@ -184,13 +194,14 @@ export default {
   methods: {
     listenScroll() {
       let w = this
-      document.onkeydown = function(e) {
+      const w = this;
+      (document.onkeydown = function(e) {
         if (e.keyCode === 17) w.ctrlDown = true
-      },
-      document.onkeyup = function(e) {
+      }),
+      (document.onkeyup = function(e) {
         if (e.keyCode === 17) w.ctrlDown = false
-      },
-      document.getElementsByClassName('container')[0].addEventListener('mousewheel',(e) => {
+      }),
+      document.getElementsByClassName('view')[0].addEventListener('mousewheel',(e) => {
         e.preventDefault();
         if(w.ctrlDown) {
           if(e.wheelDeltaY > 0) {  // 放大
@@ -200,6 +211,29 @@ export default {
           }
         }
       },false); 
+    },
+    addRightMouseEvent() {
+      let view = document.getElementsByClassName('view')[0]
+      // Prohibit the right mouse button menu display
+      view.oncontextmenu = function(){return false};     
+      view.addEventListener(
+        'mousedown',
+        e => {
+          if (e.button === 2) {
+            this.currentStatus = status.MOVING;
+          }
+        },
+        false
+      )
+      view.addEventListener(
+        'mouseup',
+        e => {
+          if (e.button === 2) {
+            this.currentStatus = status.DRAWING;
+          }
+        },
+        false
+      )
     },
     initSize() {
       this.canvas = this.$refs.canvas;
@@ -236,7 +270,7 @@ export default {
           tmpFigure.type = figure.type
           tmpFigure.points = []
           for (let i = 0; i < figure.points.length; i++) {
-            tmpFigure.points[i] = canvasToImage(
+            let tempPoint = canvasToImage(
               figure.points[i].x,
               figure.points[i].y,
               this.imagePosX,
@@ -249,6 +283,7 @@ export default {
               this.scale,
               this.degree
             );
+            tmpFigure.points[i] = {x:Math.round(tempPoint.x),y:Math.round(tempPoint.y)}
           }
           this.resultData.push(tmpFigure);
         })
@@ -351,7 +386,7 @@ export default {
       this.readyForNewEvent("draw");
     },
     configChange(config) {
-      this.options = config;
+      this.options = JSON.parse(JSON.stringify(config));
       if (this.canvasCtx) {
         this.drawBG();
         this.drawGraphics();
@@ -374,6 +409,23 @@ export default {
     // draing
     drawGraphics() {
       this.graphics.forEach((graphic, index) => {
+        // format point range when the point exceeds the image boundary
+        graphic.points.forEach((point,index)=>{
+          graphic.points[index] = formatPointRange(
+            point,
+            imagePosX,
+            imagePosY,
+            viewWidth,
+            viewHeight,
+            imageXOffset,
+            imageYOffset,
+            imageScale,
+            scale,
+            degree
+          );
+        })
+        // computedCenter
+        graphic.computedCenter()
         graphic.draw(this.canvasCtx);
         if (this.activeIndex === index && this.currentStatus === status.UPDATING) {
           graphic.drawPoints(this.canvasCtx);
@@ -398,15 +450,12 @@ export default {
         e.clientX,
         e.clientY
       );
-      if(this.isPointOutside(this.mouseStartPoint)) {
-        this.$message.closeAll();
-        this.$message.info("点在图片外面啦！")
-        return;
-      }
       this.lastMouseEndPoint = this.mouseStartPoint;
       this.canvas.addEventListener("mousemove", this.canvasMousemove, false);
       this.canvas.addEventListener("mouseup", this.canvasMouseup, false);
       document.addEventListener("keydown", this.keydownEvent, false);
+      // Do not process other logic when right click
+      if (e.button === 2) return;
       if (this.currentStatus === status.DRAWING) {
         if (this.activeGraphic == null) {
           for (let i = 0; i < this.graphics.length; i++) {
@@ -468,11 +517,6 @@ export default {
     },
     canvasMousemove(e) {
       this.mouseEndPoint = windowToCanvas(this.canvas, e.clientX, e.clientY);
-      if(this.isPointOutside(this.mouseEndPoint)) {
-        this.$message.closeAll();
-        this.$message.info("点在图片外面啦！")
-        return;
-      }
       if (this.currentStatus === status.MOVING) {
         let translateX =
           this.imageXOffset + (this.mouseEndPoint.x - this.mouseStartPoint.x);
@@ -490,10 +534,6 @@ export default {
         this.drawBG();
         this.drawGraphics();
         if (this.pointIndex > -1) {
-          // 如果超过图片边界 则停止
-          if(this.hasPointOutside(this.activeGraphic)) {
-            return;
-          }
           if (this.pointIndex === 999) {
             this.activeGraphic.move(this.lastMouseEndPoint, this.mouseEndPoint);
             this.lastMouseEndPoint = this.mouseEndPoint
@@ -621,35 +661,8 @@ export default {
     updateImage() {
       this.image.style.transform = `scale(${this.scale},${this.scale}) translate(${this.imageXOffset}px,${this.imageYOffset}px) rotateZ(${this.degree}deg)`;
     },
-    isPointOutside(point) {
-      let pointOutside = canvasToImage(
-        point.x,
-        point.y,
-        this.imagePosX,
-        this.imagePosY,
-        this.viewWidth,
-        this.viewHeight,
-        this.imageXOffset,
-        this.imageYOffset,
-        this.imageScale,
-        this.scale,
-        this.degree
-      );
-      if(pointOutside.x < 0 || pointOutside.x > this.imageWidth || pointOutside.y < 0 || pointOutside.y > this.imageHeight) {
-        return true;
-      }else{
-        return false;
-      }
-    },
-    hasPointOutside(shape) {
-      let result = false
-      shape.points.forEach((p) => {
-        if(this.isPointOutside(p)) {
-          result = true
-        }
-      })
-      return result;
-    },
+
+
     drawEventDone() {
       this.$emit('drawEventDone')
     },

@@ -121,6 +121,19 @@ export default {
 + Required: False
 > This is a callback function after clear the drawboard.
 
+### activeIndexChange
++ Type: Function
++ Required: False
+> This is a callback function after changing active index.
+
+
+### hot key
+|hot key|Feature|
+|:----|:----|
+|ctrl+scroll|zoomIn/zoomOut|
+|Right click|move|
+
+
 ## Keywords
 Drawboard canvas Vue2.x Data-labeling
 

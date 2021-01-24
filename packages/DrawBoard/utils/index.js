@@ -90,11 +90,10 @@ export function canvasToImage(x, y, posX, posY, canvasWidth, canvasHeight, image
       yvar = (x - (canvasWidth - canvasHeight) / 2 - imageXOffset * scale) - canvasHeight * (1 - scale) / 2
   }
   return {
-    x: Math.round((xvar - posX * scale) / (imageScale * scale)),
-    y: Math.round((yvar - posY * scale) / (imageScale * scale))
+    x: (xvar - posX * scale) / (imageScale * scale),
+    y: (yvar - posY * scale) / (imageScale * scale)
   }
 }
-
 
 
 /**
@@ -117,23 +116,78 @@ export function imageToCanvas(x, y, posX, posY, canvasWidth, canvasHeight, image
   yvar = y * (imageScale * scale) + posY * scale + canvasHeight * (1 - scale) / 2
 
   if (degree % 360 == 0) {
-    x = Math.round(xvar + imageXOffset * scale)
-    y = Math.round(yvar + imageYOffset * scale)
+    x = xvar + imageXOffset * scale
+    y = yvar + imageYOffset * scale
   } else if (degree % 360 == 90) {
-    x = Math.round((canvasWidth + canvasHeight) / 2 - yvar + imageXOffset * scale)
-    y = Math.round(xvar - (canvasWidth - canvasHeight) / 2 + imageYOffset * scale)
+    x = (canvasWidth + canvasHeight) / 2 - yvar + imageXOffset * scale
+    y = xvar - (canvasWidth - canvasHeight) / 2 + imageYOffset * scale
   } else if (degree % 360 == 180) {
-    x = Math.round(canvasWidth - xvar + imageXOffset * scale)
-    y = Math.round(canvasHeight - yvar + imageXOffset * scale)
+    x = canvasWidth - xvar + imageXOffset * scale
+    y = canvasHeight - yvar + imageXOffset * scale
   } else if (degree % 360 == 270) {
-    x = Math.round((canvasWidth - canvasHeight) / 2 + imageXOffset * scale + yvar)
-    y = Math.round((canvasWidth + canvasHeight) / 2 + imageYOffset * scale - xvar)
+    x = (canvasWidth - canvasHeight) / 2 + imageXOffset * scale + yvar
+    y = (canvasWidth + canvasHeight) / 2 + imageYOffset * scale - xvar
   }
   return {
     x,
     y
   }
 }
+
+
+/**
+ * format point range when the point exceeds the image boundary
+ * @param {*} point 
+ * @param {*} imagePosX 
+ * @param {*} imagePosY 
+ * @param {*} viewWidth 
+ * @param {*} viewHeight 
+ * @param {*} imageXOffset 
+ * @param {*} imageYOffset 
+ * @param {*} imageScale 
+ * @param {*} scale 
+ * @param {*} degree 
+ */
+export function formatPointRange(point,imagePosX,imagePosY,viewWidth,viewHeight,imageXOffset,imageYOffset,imageScale,scale,degree) {
+  let tempPoint = canvasToImage(
+    point.x,
+    point.y,
+    imagePosX,
+    imagePosY,
+    viewWidth,
+    viewHeight,
+    imageXOffset,
+    imageYOffset,
+    imageScale,
+    scale,
+    degree
+  )
+  if (tempPoint.x < 0) {
+    tempPoint.x = 0
+  }else if(tempPoint.x > imageWidth){
+    tempPoint.x = imageWidth
+  }
+  if (tempPoint.y < 0){
+    tempPoint.x = 0
+  }else if(tempPoint.y > imageHeight){
+    tempPoint.y = imageHeight
+  }
+  let newPoint = imageToCanvas(
+    tempPoint.x,
+    tempPoint.y,
+    imagePosX,
+    imagePosY,
+    viewWidth,
+    viewHeight,
+    imageXOffset,
+    imageYOffset,
+    imageScale,
+    scale,
+    degree
+  )
+  return newPoint;
+}
+
 
 /**
  * Make the element full screen.
@@ -162,6 +216,7 @@ export function exitScreen() {
     document.mozCancelFullScreen();
   }
 }
+
 
 /**
  * debounce
