@@ -193,7 +193,6 @@ export default {
   },
   methods: {
     listenScroll() {
-      let w = this
       const w = this;
       (document.onkeydown = function(e) {
         if (e.keyCode === 17) w.ctrlDown = true
